@@ -1,0 +1,43 @@
+//マイXXプロジェクトがWebアプリケーションなので、pluginをjavaからwarにします
+apply plugin: 'war'
+apply plugin: 'groovy'
+
+repositories {
+    jcenter()
+}
+
+ext{
+    //この拡張プロパティをマイXXプロジェクトの名前に書き換えてください
+    myPjName = 'MyProject'
+}
+
+dependencies {
+    //WebAPIComponentがマイXXプロジェクトにあると思うので、これも依存関係に入れておく必要があります
+    providedCompile 'javax:javaee-web-api:6.0'
+    
+    compile "org.codehaus.groovy:groovy-all:2.4.5"
+    compile 'org.slf4j:slf4j-api:1.7.12'
+    //マイXXプロジェクト内のjarを参照するために追加しました
+    compile fileTree(dir: "$myPjName/WEB-INF/lib", include: '*.jar')
+
+    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+    testCompile 'junit:junit:4.12'
+    //マイXXプロジェクト内のjarを参照するために追加しました
+    testCompile fileTree(dir: "$myPjName/WEB-INF/lib", include: '*.jar')
+}
+
+sourceSets{
+    main {
+        java { srcDir "$myPjName/WEB-INF/src" }
+        resources { srcDir "$myPjName/WEB-INF/resources" }
+    }
+    test {
+        java {srcDir "$myPjName/WEB-INF/test/java" }
+        resources { srcDir "$myPjName/WEB-INF/test/resources" }
+        groovy { srcDir 'src/test/groovy' } 
+    }
+}
+
+def defaultEncoding = 'UTF-8'
+tasks.withType(AbstractCompile).each { it.options.encoding = defaultEncoding }
+tasks.withType(GroovyCompile).each { it.groovyOptions.encoding = defaultEncoding }
